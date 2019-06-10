@@ -1,5 +1,5 @@
 
-'''Algoritmo que implementa o Método Numérico de Euler na equação diferencial que modela 
+'''Algoritmo que implementa o Método Numérico de Runge-Kutta 4 na equação diferencial que modela 
 	a doença Encefalopatia Espongiforme Bovina (doença da Vaca Louca)
     Copyright (C) 2019  Valdinei da Silva Santos
 
@@ -22,17 +22,17 @@ import math
 # Problema 0:
 # EEB
 
-def metodo_euler(f_antes, h, edo):
-	return f_antes + h * edo
+def metodo_runge_kutta(f_antes, h, edo_antes, edo_meio_1, edo_meio_2, edo_agora):
+	return f_antes + h * (edo_antes + (2*edo_meio_1) + (2*edo_meio_2) + edo_agora)/6
 
-def edo(b):
-	return 0.01*(1-b)*b 
+def edo(Q):
+	return 0.01*(1-Q)*Q
 
 
 def abrir_arquivo():
-	arquivo = open("Problema0-Método-Euler.txt", "w")
-	arquivo.write("iteração \t Eixo x \t Eixo y \n")
-	return arquivo	
+	arquivo = open("Problema0-Método-Runge-Kutta-4-Ordem.txt", "w")
+	arquivo.write("iteração \t Eixo x \t Eixo y\n")
+	return arquivo
 
 def plotar_grafico(coordenadas_x, coordenadas_y):
 	plt.plot(coordenadas_x, coordenadas_y)
@@ -44,11 +44,12 @@ def plotar_grafico(coordenadas_x, coordenadas_y):
 
 def main():
 	#Condições Iniciais
-	b = 10**(-14)
+	Q = 10**(-14)
 	x = 0
 	h = 1
 	coordenadas_x = []
 	coordenadas_y = []
+	erro_global_trunc = 0
 	count = 0
 
 	#Abrir arquivo
@@ -58,19 +59,25 @@ def main():
 	while(x <= 4000):
 		count += 1
 
+
 		#Escrever coordenadas no arquivo:
-		arquivo.write("%-8s \t %-8s \t %-8s \n" % (str(count), str(x), str(b)))
+		arquivo.write("%-8s \t %-8s \t %-8s \n" % (str(count), str(x), str(Q)))
 
 		#Salvar coordenadas em array
 		coordenadas_x.append(x)
-		coordenadas_y.append(b)
-		
+		coordenadas_y.append(Q)
+
+		#Derivadas
+		k1 = edo(Q)
+		k2 = edo(Q + (h/2)*k1)
+		k3 = edo(Q + (h/2)*k2)
+		k4 = edo(Q + h*k3)
 
 		#Atualizações
-		b = metodo_euler(b, h, edo(b))
+		Q = metodo_runge_kutta(Q, h, k1, k2, k3, k4)
 		x = x + h
-
-	#Retornar as coordenadas 
+		
+	#Retornar coordenadas
 	return [coordenadas_x, coordenadas_y]
 	#Para plotar o gráfico, descomente a linha abaixo e comente a linha acima
 	#plotar_grafico(coordenadas_x, coordenadas_y)

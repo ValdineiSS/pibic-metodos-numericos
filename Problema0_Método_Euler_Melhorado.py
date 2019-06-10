@@ -1,5 +1,5 @@
 
-'''Algoritmo que implementa o Método Numérico de Euler na equação diferencial que modela 
+'''Algoritmo que implementa o Método Numérico de Euler Melhorado na equação diferencial que modela 
 	a doença Encefalopatia Espongiforme Bovina (doença da Vaca Louca)
     Copyright (C) 2019  Valdinei da Silva Santos
 
@@ -22,16 +22,21 @@ import math
 # Problema 0:
 # EEB
 
+def metodo_euler_melhorado(f_antes, h, edo_antes, edo_agora):
+	return f_antes + h * (edo_antes + edo_agora)/2
+
 def metodo_euler(f_antes, h, edo):
 	return f_antes + h * edo
 
 def edo(b):
 	return 0.01*(1-b)*b 
 
+def equacao_analitica(x):
+	return 25 - 25*math.exp((-3/100)*x)
 
 def abrir_arquivo():
-	arquivo = open("Problema0-Método-Euler.txt", "w")
-	arquivo.write("iteração \t Eixo x \t Eixo y \n")
+	arquivo = open("Problema0-Método-Euler-Melhorado.txt", "w")
+	arquivo.write("iteração \t Eixo x \t Eixo y\n")
 	return arquivo	
 
 def plotar_grafico(coordenadas_x, coordenadas_y):
@@ -49,6 +54,7 @@ def main():
 	h = 1
 	coordenadas_x = []
 	coordenadas_y = []
+	erro_global_trunc = 0
 	count = 0
 
 	#Abrir arquivo
@@ -58,19 +64,23 @@ def main():
 	while(x <= 4000):
 		count += 1
 
+
 		#Escrever coordenadas no arquivo:
 		arquivo.write("%-8s \t %-8s \t %-8s \n" % (str(count), str(x), str(b)))
 
 		#Salvar coordenadas em array
 		coordenadas_x.append(x)
 		coordenadas_y.append(b)
-		
+
+		#Derivadas
+		k1 = edo(b)
+		k2 = edo(metodo_euler(b, h, edo(b)))
 
 		#Atualizações
-		b = metodo_euler(b, h, edo(b))
+		b = metodo_euler_melhorado(b, h, k1, k2)
 		x = x + h
 
-	#Retornar as coordenadas 
+	#Retornar coordenadas
 	return [coordenadas_x, coordenadas_y]
 	#Para plotar o gráfico, descomente a linha abaixo e comente a linha acima
 	#plotar_grafico(coordenadas_x, coordenadas_y)

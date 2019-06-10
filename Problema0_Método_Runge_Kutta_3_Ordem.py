@@ -1,5 +1,5 @@
 
-'''Algoritmo que implementa o Método Numérico de Euler na equação diferencial que modela 
+'''Algoritmo que implementa o Método Numérico de Runge-Kutta 3 na equação diferencial que modela 
 	a doença Encefalopatia Espongiforme Bovina (doença da Vaca Louca)
     Copyright (C) 2019  Valdinei da Silva Santos
 
@@ -17,22 +17,20 @@
 '''
 
 import matplotlib.pyplot as plt
-import math
 
 # Problema 0:
 # EEB
+                              
+def metodo_runge_kutta_3_ordem(f_antes, h, edo_antes, edo_meio, edo_agora):
+	return f_antes + h * (edo_antes + (4*edo_meio)  + edo_agora)/6
 
-def metodo_euler(f_antes, h, edo):
-	return f_antes + h * edo
-
-def edo(b):
-	return 0.01*(1-b)*b 
-
+def edo(Q):
+	return 0.01*(1-Q)*Q
 
 def abrir_arquivo():
-	arquivo = open("Problema0-Método-Euler.txt", "w")
+	arquivo = open("Problema0-Método-Runge-Kutta-3-Ordem.txt", "w")
 	arquivo.write("iteração \t Eixo x \t Eixo y \n")
-	return arquivo	
+	return arquivo
 
 def plotar_grafico(coordenadas_x, coordenadas_y):
 	plt.plot(coordenadas_x, coordenadas_y)
@@ -44,7 +42,7 @@ def plotar_grafico(coordenadas_x, coordenadas_y):
 
 def main():
 	#Condições Iniciais
-	b = 10**(-14)
+	Q = 10**(-14)
 	x = 0
 	h = 1
 	coordenadas_x = []
@@ -59,21 +57,25 @@ def main():
 		count += 1
 
 		#Escrever coordenadas no arquivo:
-		arquivo.write("%-8s \t %-8s \t %-8s \n" % (str(count), str(x), str(b)))
+		arquivo.write("%-8s \t %-8s \t %-8s \n" % (str(count), str(x), str(Q)))
 
 		#Salvar coordenadas em array
 		coordenadas_x.append(x)
-		coordenadas_y.append(b)
-		
+		coordenadas_y.append(Q)
+
+		#Derivadas
+		k1 = edo(Q)
+		k2 = edo(Q + (h/2)*k1)
+		k3 = edo(Q + (h)*(2*k2 -1*k1))
 
 		#Atualizações
-		b = metodo_euler(b, h, edo(b))
+		Q = metodo_runge_kutta_3_ordem(Q, h, k1, k2, k3)
 		x = x + h
 
-	#Retornar as coordenadas 
+	#Retornar coordenadas
 	return [coordenadas_x, coordenadas_y]
 	#Para plotar o gráfico, descomente a linha abaixo e comente a linha acima
 	#plotar_grafico(coordenadas_x, coordenadas_y)
 
+
 main()
-		
